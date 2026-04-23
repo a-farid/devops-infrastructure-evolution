@@ -112,9 +112,6 @@ minikube stop
 3. **Mongo-Express**: Web interface running on port 8081, exposed via LoadBalancer.
 4. **Inter-Service Communication**: Mongo-Express uses environment variables from Secret and ConfigMap to connect securely.
 
-## Next Steps
+## Next Step
 
 - Add persistent volumes for data persistence.
-- Scale deployments or add replicas.
-- Integrate with other services like a web app.
-- Explore MongoDB backups and restores.
