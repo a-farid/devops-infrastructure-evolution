@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-namespace
+  labels:
+    purpose: application-tier
+    environment: development
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database-namespace
+  labels:
+    purpose: database-tier
+    environment: development

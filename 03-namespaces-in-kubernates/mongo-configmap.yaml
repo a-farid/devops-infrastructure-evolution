@@ -1,0 +1,43 @@
+# Secret and ConfigMap for database-namespace (used by MongoDB)
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: database-namespace
+type: Opaque
+data:
+  mongo-root-username: dXNlcm5hbWU=
+  mongo-root-password: cGFzc3dvcmQ=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+  namespace: database-namespace
+data:
+  # Full service URL with namespace for cross-namespace communication
+  database_url: mongodb-service.database-namespace.svc.cluster.local
+
+---
+# Secret and ConfigMap for app-namespace (used by Mongo-Express)
+# Note: Mongo-Express needs access to the same credentials and database URL
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: app-namespace
+type: Opaque
+data:
+  mongo-root-username: dXNlcm5hbWU=
+  mongo-root-password: cGFzc3dvcmQ=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-configmap
+  namespace: app-namespace
+data:
+  # Full service URL for cross-namespace communication
+  database_url: mongodb-service.database-namespace.svc.cluster.local
