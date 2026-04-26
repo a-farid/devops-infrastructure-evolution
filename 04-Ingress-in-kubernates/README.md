@@ -17,9 +17,9 @@ This module demonstrates deploying a full application stack on Kubernetes using 
                               │   (mongo.local -> mongo-express)    │
                               └──────────────┬──────────────────────┘
                                              │
-                                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     app-namespace                               │
+                                             │
+┌───────────────────────────────────────────────────────────────┐
+│                     app-namespace          ▼                  │
 │  ┌─────────────────────┐      ┌─────────────────────────────┐ │
 │  │ mongodb-express     │      │ mongodb-express-service     │ │
 │  │ (Web UI :8081)      │◄─────│ (ClusterIP)                 │ │
@@ -28,13 +28,13 @@ This module demonstrates deploying a full application stack on Kubernetes using 
 │  │ mongodb-secret      │      │ mongodb-configmap           │ │
 │  │ (Credentials)       │      │ (database_url)              │ │
 │  └─────────────────────┘      └─────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────┘
                               │
                               │ Cross-namespace communication
                               │ (mongodb-service.database-namespace.svc.cluster.local)
                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   database-namespace                            │
+┌───────────────────────────────────────────────────────────────┐
+│                   database-namespace                          │
 │  ┌─────────────────────┐      ┌─────────────────────────────┐ │
 │  │ mongodb             │      │ mongodb-service             │ │
 │  │ (Database :27017)   │──────│ (ClusterIP)                 │ │
@@ -43,7 +43,7 @@ This module demonstrates deploying a full application stack on Kubernetes using 
 │  │ mongodb-secret      │      │ mongodb-configmap           │ │
 │  │ (Credentials)       │      │ (database_url)              │ │
 │  └─────────────────────┘      └─────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ## Why Use Ingress?
@@ -60,9 +60,19 @@ This module demonstrates deploying a full application stack on Kubernetes using 
 - `mongo-configmap.yaml`: Secrets and ConfigMaps for both namespaces.
 - `mongo.yaml`: MongoDB Deployment and Service (ClusterIP) in `database-namespace`.
 - `mongo-express.yaml`: Mongo-Express Deployment and Service (ClusterIP) in `app-namespace`.
-- `ingress.yaml`: Ingress resource routing `mongo.local` to Mongo-Express.
+- `ingress.yaml`: Ingress resource with TLS and HTTP→HTTPS redirect.
 - `start-mongo-app.sh`: Deploys everything with one command.
 - `cleanup-mongo-app.sh`: Removes all resources including namespaces.
+
+## TLS/SSL Configuration
+
+This module includes a self-signed TLS certificate for HTTPS access:
+
+- **TLS Secret**: `mongo-tls-secret` in `app-namespace` contains the certificate and key.
+- **HTTP→HTTPS Redirect**: All HTTP traffic is automatically redirected to HTTPS.
+- **Certificate**: Self-signed certificate (for local testing only).
+
+The TLS secret is defined in `mongo-configmap.yaml` with base64-encoded certificate and key.
 
 ## Prerequisites
 
@@ -79,6 +89,7 @@ chmod +x start-mongo-app.sh cleanup-mongo-app.sh
 ```
 
 The script will:
+
 1. Start Minikube (or skip if already running)
 2. Enable Ingress addon
 3. Create both namespaces
@@ -99,40 +110,69 @@ minikube tunnel
 # Terminal 2: Add to /etc/hosts
 echo "127.0.0.1 mongo.local" | sudo tee -a /etc/hosts
 
-# Then open in browser:
-open http://mongo.local
+# Then open in browser (HTTPS with self-signed certificate):
+open https://mongo.local
 ```
 
-> **Note**: The `minikube tunnel` command must remain running while you want to access the application. It creates a tunnel to the Ingress controller. Press `Ctrl+C` to stop it when done.
+**Note**:
+
+> - The `minikube tunnel` command must remain running while you want to access the application.
+> - Since we're using a self-signed certificate, your browser will show a security warning. This is expected.
+> - All HTTP traffic is automatically redirected to HTTPS.
+
+### Accepting the Self-Signed Certificate
+
+When you see "Your connection isn't private" error:
+
+**Chrome/Edge:**
+
+1. Click "Advanced"
+2. Click "Proceed to mongo.local (unsafe)"
+
+**Safari:**
+
+1. Click "Show Details"
+2. Click "visit this website"
+
+**Firefox:**
+
+1. Click "Advanced"
+2. Click "Accept the Risk and Continue"
 
 ## Manual Deployment Steps
 
 1. Create namespaces:
+
    ```bash
    kubectl apply -f namespaces.yaml
    ```
 
 2. Apply ConfigMap and Secret:
+
    ```bash
    kubectl apply -f mongo-configmap.yaml
    ```
 
 3. Deploy MongoDB:
+
    ```bash
    kubectl apply -f mongo.yaml
    ```
 
 4. Deploy Mongo-Express:
+
    ```bash
    kubectl apply -f mongo-express.yaml
    ```
 
 5. Apply Ingress:
+
    ```bash
    kubectl apply -f ingress.yaml
    ```
 
 6. Access:
+
    ```bash
    # Terminal 1: Start tunnel (keep running)
    minikube tunnel
@@ -140,8 +180,8 @@ open http://mongo.local
    # Terminal 2: Add to /etc/hosts
    echo "127.0.0.1 mongo.local" | sudo tee -a /etc/hosts
 
-   # Open browser
-   open http://mongo.local
+   # Open browser (HTTPS with self-signed certificate)
+   open https://mongo.local
    ```
 
 ## Cross-Namespace Communication
