@@ -69,6 +69,7 @@ When connecting to a service in a different namespace, you must use the **Fully 
 ```
 
 In this setup:
+
 - MongoDB runs in `database-namespace` with its own Secret and ConfigMap
 - Mongo-Express runs in `app-namespace` with its own Secret and ConfigMap
 - The ConfigMap in `app-namespace` contains `database_url: mongodb-service.database-namespace.svc.cluster.local`
@@ -84,6 +85,7 @@ chmod +x start-mongo-app.sh cleanup-mongo-app.sh
 ```
 
 The script will:
+
 1. Start Minikube
 2. Create both namespaces
 3. Deploy Secrets and ConfigMap to `database-namespace`
@@ -95,32 +97,38 @@ The script will:
 ## Manual Deployment Steps
 
 1. Create namespaces:
+
    ```bash
    kubectl apply -f namespaces.yaml
    ```
 
 2. Apply ConfigMap and Secret:
+
    ```bash
    kubectl apply -f mongo-configmap.yaml
    ```
 
 3. Deploy MongoDB:
+
    ```bash
    kubectl apply -f mongo.yaml
    ```
 
 4. Deploy Mongo-Express:
+
    ```bash
    kubectl apply -f mongo-express.yaml
    ```
 
 5. Verify:
+
    ```bash
    kubectl get all -n app-namespace
    kubectl get all -n database-namespace
    ```
 
 6. Access Mongo-Express:
+
    ```bash
    minikube service mongodb-express-service -n app-namespace --url
    ```
