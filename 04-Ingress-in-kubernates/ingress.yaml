@@ -7,7 +7,11 @@ metadata:
     # Use nginx ingress controller
     nginx.ingress.kubernetes.io/rewrite-target: / # Rewrite the URL path to root when forwarding to the service
 spec:
-  ingressClassName: nginx # Specify the ingress class to use (nginx in this case)
+  tls:
+  - hosts:
+    - mongo.local # Hostname for TLS (must match the host in rules)
+    secretName: mongo-tls-secret # Name of the TLS secret (create this with a self-signed cert for local testing)
+
   rules:
   - host: mongo.local # Hostname to access the application (add to /etc/hosts for local testing)
     http:
@@ -19,3 +23,10 @@ spec:
             name: mongodb-express-service
             port:
               number: 8081 # Port of the Mongo-Express service to route to
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: mongodb-express-service
+            port:
+              number: 8081 # Route /api to the same service for API access (For testing multiple paths)
