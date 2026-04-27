@@ -1,23 +1,19 @@
+# Ingress for routing external traffic to Mongo-Express
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mongo-ingress
   namespace: app-namespace
   annotations:
-    # Use nginx ingress controller
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    # Redirect HTTP to HTTPS
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Force HTTPS even without proper certificate (for self-signed certs) - useful for development
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-
 spec:
-  # Define TLS settings for secure communication
+  ingressClassName: nginx
   tls:
-  - hosts:
-    - mongo.local
-    secretName: mongo-tls-secret
-  # Define rules for routing traffic to the Mongo-Express service
+    - hosts:
+        - mongo.local
+      secretName: mongo-tls-secret
   rules:
   - host: mongo.local
     http:

@@ -1,0 +1,17 @@
+# Namespace for application tier (Mongo-Express)
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-namespace
+  labels:
+    tier: application
+
+---
+# Namespace for database tier (MongoDB)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database-namespace
+  labels:
+    tier: database

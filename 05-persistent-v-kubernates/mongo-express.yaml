@@ -1,0 +1,67 @@
+# Mongo-Express Deployment and Service in app-namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-express-deployment
+  namespace: app-namespace
+  labels:
+    app: mongodb-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-express
+  template:
+    metadata:
+      labels:
+        app: mongodb-express
+    spec:
+      containers:
+      - name: mongodb-express
+        image: mongo-express:latest
+        ports:
+        - containerPort: 8081
+          name: mongodb-express
+        # Environment variables for Mongo-Express configuration
+        env:
+        - name: ME_CONFIG_MONGODB_SERVER
+          value: mongodb-service.database-namespace.svc.cluster.local
+        - name: ME_CONFIG_MONGODB_PORT
+          value: "27017"
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        # Resource limits
+        resources:
+          requests:
+            cpu: 500m
+            memory: 128Mi
+          limits:
+            cpu: 1
+            memory: 256Mi
+
+---
+# Mongo-Express Service (ClusterIP - internal only)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-express-service
+  namespace: app-namespace
+  labels:
+    app: mongodb-express
+spec:
+  type: ClusterIP
+  selector:
+    app: mongodb-express
+  ports:
+  - port: 8081
+    targetPort: 8081
+    name: mongodb-express

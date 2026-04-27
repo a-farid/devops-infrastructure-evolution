@@ -1,0 +1,24 @@
+# PersistentVolumeClaim for MongoDB data
+# This PVC will be bound to a PersistentVolume to store MongoDB data
+# Data will persist even when pods are deleted or cluster is stopped
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: database-namespace
+  labels:
+    app: mongodb
+    type: data-storage
+spec:
+  # Access mode: ReadWriteOnce - can be mounted by a single node
+  accessModes:
+    - ReadWriteOnce
+  # Request 1Gi of storage
+  resources:
+    requests:
+      storage: 1Gi
+  # Use the default storage class (standard in Minikube)
+  storageClassName: standard
+  # Volume mode: Filesystem (default)
+  volumeMode: Filesystem
