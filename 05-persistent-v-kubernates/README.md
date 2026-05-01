@@ -60,6 +60,32 @@ This module demonstrates deploying a full application stack on Kubernetes with p
 | Minikube restart | Data lost | Data preserved |
 | Node failure | Data lost | Data preserved (if replicated) |
 
+## Known Issue and Fix
+
+- During deployment, `kubectl apply -f mongo-configmap.yaml` may fail with:
+  - `Secret in version "v1" cannot be handled as a Secret: illegal base64 data`
+- Root cause: the TLS Secret block in `mongo-configmap.yaml` used invalid base64 values for `tls.crt` and `tls.key`.
+- Fix: use `stringData` for the TLS secret in `mongo-configmap.yaml`, with PEM text directly in the manifest.
+- Example:
+  ```yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: mongo-tls-secret
+    namespace: app-namespace
+  type: kubernetes.io/tls
+  stringData:
+    tls.crt: |-
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+    tls.key: |-
+      -----BEGIN PRIVATE KEY-----
+      ...
+      -----END PRIVATE KEY-----
+  ```
+- This avoids base64 padding errors and allows the stack to deploy correctly.
+
 ## Files
 
 - `namespaces.yaml`: Defines `app-namespace` and `database-namespace`.
