@@ -22,7 +22,6 @@ data:
 ---
 # Secret and ConfigMap for app-namespace (used by Mongo-Express)
 # Note: Mongo-Express needs access to the same credentials and database URL
----
 apiVersion: v1
 kind: Secret
 metadata:
