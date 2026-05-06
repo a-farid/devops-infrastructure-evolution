@@ -1,0 +1,24 @@
+replicaCount: 1
+architecture: replicaset
+
+primary:
+  persistence:
+    enabled: true
+    size: 8Gi
+
+auth:
+  rootPassword: change-me-root-password
+  username: mongo_user
+  password: change-me-user-password
+  database: mydatabase
+
+service:
+  type: ClusterIP
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
