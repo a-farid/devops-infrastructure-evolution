@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-web-app-depl
+  labels:
+    app: my-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      imagePullSecrets: # Reference to the secret that contains the credentials for the private registry
+      - name: my-registry-key
+      containers:
+      - name: my-app-container
+        image: 151217935392.dkr.ecr.eu-west-3.amazonaws.com/my-app:1.0
+        imagePullPolicy: Always # Always pull the image to ensure we get the latest version
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
