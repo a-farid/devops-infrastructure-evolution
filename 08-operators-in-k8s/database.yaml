@@ -1,0 +1,22 @@
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: my-mongo
+spec:
+  members: 1 # For Minikube, let's keep it to 1 node to save RAM
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: admin
+      db: admin
+      passwordSecretRef: 
+        name: mongo-admin-password # We will create this secret
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: readWriteAnyDatabase
+          db: admin
+      scramCredentialsMechanism: SCRAM-SHA-256

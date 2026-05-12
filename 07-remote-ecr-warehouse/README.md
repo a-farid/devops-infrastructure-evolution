@@ -19,8 +19,9 @@ This folder contains a Kubernetes deployment example that pulls a private image 
   - Actual credential data is not committed.
   - The script overwrites it with the current ECR token.
 
-- `.gitignore`
-  - Contains `ecr-secret.yaml` so the generated secret file is not tracked.
+- `cleanup.sh`
+  - Bash script to remove the deployment and secret from the cluster.
+  - Checks if resources exist before attempting deletion.
 
 ## Usage
 
@@ -57,13 +58,15 @@ export NAMESPACE=default
 export OUTPUT_FILE=ecr-secret.yaml
 ```
 
-### Deploy the application
+### Clean up resources
 
-Apply the deployment manifest after the secret exists:
+Run:
 
 ```bash
-kubectl apply -f deployment.yaml
+./cleanup.sh
 ```
+
+This removes the deployment and secret from the cluster. It checks if the resources exist before deleting them.
 
 ### Secret lifetime
 
@@ -79,6 +82,8 @@ AWS ECR authorization tokens expire after 12 hours, so rerun `./generate_aws_pw.
 
 ```bash
 cd 07-remote-ecr-warehouse
+# ... later ...
+./cleanup.sh
 ./generate_aws_pw.sh
 kubectl apply -f deployment.yaml
 ```
