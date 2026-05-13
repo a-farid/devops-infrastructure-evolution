@@ -12,11 +12,12 @@ spec:
   users:
     - name: admin
       db: admin
-      passwordSecretRef: 
-        name: mongo-admin-password # We will create this secret
+      passwordSecretRef:
+        name: mongo-admin-password
+        key: password
+      scramCredentialsSecretName: admin-scram-credentials
       roles:
         - name: clusterAdmin
           db: admin
         - name: readWriteAnyDatabase
           db: admin
-      scramCredentialsMechanism: SCRAM-SHA-256
