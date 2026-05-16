@@ -18,11 +18,9 @@ metadata:
 data:
   # Full service URL with namespace for cross-namespace communication
   database_url: mongodb-service.database-namespace.svc.cluster.local
-
 ---
 # Secret and ConfigMap for app-namespace (used by Mongo-Express)
 # Note: Mongo-Express needs access to the same credentials and database URL
----
 apiVersion: v1
 kind: Secret
 metadata:

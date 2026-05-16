@@ -1,0 +1,25 @@
+# Step 1: Create the study namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: study-space
+
+---
+# Step 2: Create a service account for the limited user
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: user-app
+  namespace: study-space
+
+---
+# Step 3: Create MongoDB credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongo-root-credentials
+  namespace: study-space
+type: Opaque
+stringData:
+  mongodb-root-username: admin
+  mongodb-root-password: MyS3curePssw0rd

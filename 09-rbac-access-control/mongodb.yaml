@@ -1,0 +1,55 @@
+
+# Step 4: Deploy MongoDB
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: study-space
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:6.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-root-credentials
+              key: mongodb-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-root-credentials
+              key: mongodb-root-password
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# Step 5: Expose MongoDB inside the namespace
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  namespace: study-space
+spec:
+  selector:
+    app: mongo
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017

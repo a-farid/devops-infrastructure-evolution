@@ -1,0 +1,26 @@
+# Step 9: Create a read-only Role for pods and services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: study-space
+  name: readonly-basic
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "list"]
+
+---
+# Step 10: Bind the read-only Role to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: study-space
+  name: bind-user-app-readonly
+subjects:
+- kind: ServiceAccount
+  name: user-app
+  namespace: study-space
+roleRef:
+  kind: Role
+  name: readonly-basic
+  apiGroup: rbac.authorization.k8s.io
